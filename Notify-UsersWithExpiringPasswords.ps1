@@ -30,6 +30,8 @@ $separator = @"
 
 
     # Construct the email credentials for the SendGrid user
+    # Refer to this for generating these SecureString text files - it's not all that secure, other encryption could be used
+    # https://www.pdq.com/blog/secure-password-with-powershell-encrypting-credentials-part-1/
     $username = "SendGridUser"
     $pass = Get-Content C:\ProgramData\Scripts\emailPass.txt | ConvertTo-SecureString
     $Creds = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $username, $pass
@@ -90,7 +92,7 @@ Function Check-ADUsersPasswordsExpiringSoon(){
     Import-Module ActiveDirectory
 
     # Second, define initial variables
-    $ignoreList = @("serviceaccount1", "sql", "exchangesync", "scanner", "iituser")
+    $ignoreList = @("serviceaccount1", "sql", "exchangesync", "scanner", "adminuser1")
     $AllUsers = get-aduser -filter * -properties * | Where-Object {$_.Enabled -eq "True"} | Where-Object { $_.PasswordNeverExpires -eq $false } `
     | Where-Object { $_.passwordexpired -eq $false } | Where-Object {$_.Name -notlike "SBS*"} | Where-Object {$_.SamAccountName -NotIn $ignoreList}
 
