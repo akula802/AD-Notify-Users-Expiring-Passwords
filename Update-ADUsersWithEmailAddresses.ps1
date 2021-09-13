@@ -6,7 +6,7 @@ Import-Module ActiveDirectory
 
 #Initial vars
 $ignoreList = @("exchangesync", "scanner", "serviceaccount1")
-$userou = 'CN=Users,DC=yourdomain,DC=local'
+$userou = 'OU=Users,DC=yourdomain,DC=local'
 $users = Get-ADUser -Filter * -SearchBase $userou -Properties * `
     | where {$_.Enabled -eq "True"} `
     | where { $_.PasswordNeverExpires -eq $false } `
@@ -16,7 +16,14 @@ ForEach($user in $users)
     {
         if (($user.Enabled -eq $true) -and (!($user.EmailAddress)) -and ($user.SamAccountName -notin $ignoreList))
             {
+                # To update with a SamAccountName@ format:
                 $NewEmail = $user.SamAccountName.ToString() + "@yourdomain.com"
+                
+                # To update with a firstname.lastname@ format:
+                #$firstName = $user.GivenName.Split(" ")[0]
+                #$lastName = $user.Surname.Replace(" ", "")
+                #$NewEmail = $firstName + "." + $lastName + "@yourdomain.com"
+                
                 Write-Host $NewEmail
 
                 try
